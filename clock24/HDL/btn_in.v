@@ -14,6 +14,7 @@ module BTN_IN (
 reg [20:0] cnt;
 
 wire en40hz = (cnt==1250000-1);
+// wire en40hz = (cnt==5_000_000-1); // en5hz これを有効にするとほんとにボタンが反応しない！！！
 
 always @( posedge CLK ) begin
     if ( RST )
@@ -24,17 +25,38 @@ always @( posedge CLK ) begin
         cnt <= cnt + 21'b1;
 end
 
-/*  ボタン入力をFF2個で受ける*/
+// メタステーブル(0か1かが決まらない状態)対策
+reg [2:0] sync1;
+reg [2:0] sync2;
+
+always @(posedge CLK) begin
+    if(RST) begin
+        sync1 <= 3'b111;
+        sync2 <= 3'b111;
+    end
+    else begin
+        sync1 <= nBIN;
+        sync2 <= sync1;
+        //sync1がメタステーブルを受け取った1clk後に、
+        //メタステーブル状態が解消されどちらかの状態に決まる。
+
+        // sync2はボタンが押されている間しか値を保持してくれない
+        // →ボタンを押す時間>>1/40s　という関係が成り立っていないと、ff1に値が転送されない。
+        // 魂の16連打とかいうぐらいだから、40Hzというのはボタンを
+    end
+end
+
+// ここから、wire [2:0] temp .... までがボタンを押した瞬間をとらえる回路
 reg [2:0] ff1, ff2;
 
 always @( posedge CLK ) begin
     if ( RST ) begin
-        ff2 <=3'b0;
-        ff1 <=3'b0;
+        ff2 <=3'b111;
+        ff1 <=3'b111;
     end
     else if ( en40hz ) begin
         ff2 <= ff1;
-        ff1 <= nBIN;
+        ff1 <= sync2;
     end
 end
 
