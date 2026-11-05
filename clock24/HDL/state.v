@@ -46,9 +46,9 @@ always @(posedge CLK) begin // beginを忘れないように、CLKに同期さ�
     end
 end
 
-assign SECON = ((s==SEC) && SIG2HZ) || (s==NORM);
-assign MINON = (s==MIN) && SIG2HZ;
-assign HOURON = (s==HOUR) && SIG2HZ;
+assign SECON = ~((s==SEC) && ~SIG2HZ);
+assign MINON = ~((s==MIN) && ~SIG2HZ);
+assign HOURON = ~((s==HOUR) && ~SIG2HZ);
 assign SECCLR = (s==SEC) && ACTION;
 assign MININC = (s==MIN) && ACTION;
 assign HOURINC = (s==HOUR) && ACTION; 
