@@ -6,16 +6,16 @@
 module SECCNT(
     input CLK,RST,
     input EN1HZ,
+    input SECCLR,
     output reg [3:0] SECH,SECL,//regが必須
     output CASEC
 );
 
 always @(posedge CLK) begin
-    if (RST) begin
+    if (RST|SECCLR) begin
         SECH <= 0;
         SECL <= 0;
     end
-    // SECCLRを導入する
     else if (EN1HZ) begin
         SECL <= SECL + 1;
         if (SECL==9) begin

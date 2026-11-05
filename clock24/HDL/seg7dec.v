@@ -11,7 +11,7 @@ module SEG7DEC(
 );// ;を忘れない
 
 always @* begin
-    if (LIGHTON)
+    if (LIGHTON) begin// 忘れるな
         case(HEXNUM)
             4'h0:  HEXn = 7'b1000000;//40(10)
             4'h1:  HEXn = 7'b1111001;//79(10)
@@ -25,6 +25,9 @@ always @* begin
             4'h9:  HEXn = 7'b0010000;
             default: HEXn = 7'b1111111;// ;を忘れない
         endcase
+    end
+    else
+        HEXn=7'b1111111;
 end
 
 endmodule//忘れるな
